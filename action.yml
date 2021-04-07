@@ -1,4 +1,4 @@
-name: 'build'
+name: 'compas-actions.build'
 description: 'Build and test COMPAS or its plugins'
 
 runs:
