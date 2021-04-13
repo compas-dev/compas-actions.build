@@ -10,10 +10,6 @@ inputs:
     description: 'whether to test with python -m compas'
     required: true
     default: 'false'
-  command:
-    description: 'the test command'
-    required: true
-    default: 'invoke test'
 
 runs:
   using: "composite"
@@ -37,4 +33,4 @@ runs:
         fi;
 
     - shell: bash
-      run: eval ${{ inputs.test_command }}
+      run: invoke test
