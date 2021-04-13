@@ -37,4 +37,4 @@ runs:
         fi;
 
     - shell: bash
-      run: ${{ inputs.test_command }}
+      run: eval ${{ inputs.test_command }}
