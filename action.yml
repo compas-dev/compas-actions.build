@@ -17,14 +17,14 @@ runs:
     - shell: bash
       run: |
         if [[ ${{ runner.os }} == "Windows" && -f env_win.yml ]]; then
-          conda env create -f env_osx.yml -n test
-          conda activate test
+          conda env create -f env_osx.yml -n compas-build
+          conda activate compas-build
         elif [[ ${{ runner.os }} == "macOS" && -f env_osx.yml ]]; then
-          conda env create -f env_osx.yml -n test
-          conda activate test
+          conda env create -f env_osx.yml -n compas-build
+          conda activate compas-build
         elif [[ ${{ runner.os }} == "Linux" && -f env_linux.yml ]]; then
-          conda env create -f env_linux.yml -n test
-          conda activate test
+          conda env create -f env_linux.yml -n compas-build
+          conda activate compas-build
         else
           python -m pip install --upgrade pip
           pip install cython --install-option='--no-cython-compile'
