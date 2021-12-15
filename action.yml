@@ -16,21 +16,27 @@ runs:
   steps:
     - shell: bash
       run: |
-        python -m pip install --upgrade pip
-        pip install cython --install-option='--no-cython-compile'
-        pip install --no-cache-dir -r requirements-dev.txt
+        if [[ ${{ runner.os }} == "Windows" && -f env_win.yml ]]; then
+          conda env create -f env_osx.yml -n test
+          conda activate test
+        elif [[ ${{ runner.os }} == "macOS" && -f env_osx.yml ]]; then
+          conda env create -f env_osx.yml -n test
+          conda activate test
+        elif [[ ${{ runner.os }} == "Linux" && -f env_linux.yml ]]; then
+          conda env create -f env_linux.yml -n test
+          conda activate test
+        else
+          python -m pip install --upgrade pip
+          pip install cython --install-option='--no-cython-compile'
+          pip install --no-cache-dir -r requirements-dev.txt
+        fi
 
-    - shell: bash
-      run: |
         if [[ ${{ inputs.test_lint }} = "true" ]]; then
           invoke lint
         fi;
 
-    - shell: bash
-      run: |
         if [[ ${{ inputs.test_compas }} = "true" ]]; then
           python -m compas
         fi;
-
-    - shell: bash
-      run: invoke test
+        
+        invoke test
