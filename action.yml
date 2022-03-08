@@ -1,42 +1,72 @@
-name: 'compas-actions.build'
-description: 'Build and test COMPAS or its plugins'
+name: "compas-actions.build"
+description: "Build and test COMPAS or its plugins"
 
 inputs:
   test_lint:
-    description: 'whether to test lint errors'
+    description: "whether to test lint errors"
     required: true
-    default: 'false'
+    default: "false"
   test_compas:
-    description: 'whether to test with python -m compas'
+    description: "whether to test with python -m compas"
     required: true
-    default: 'false'
+    default: "false"
 
 runs:
   using: "composite"
   steps:
     - shell: bash -l {0}
       run: |
+        IS_CONDA_PACKAGE=false
+
         if [[ ${{ runner.os }} == "Windows" && -f env_win.yml ]]; then
           conda env create -f env_win.yml -n compas-build
           conda activate compas-build
+          IS_CONDA_PACKAGE=true
         elif [[ ${{ runner.os }} == "macOS" && -f env_osx.yml ]]; then
           conda env create -f env_osx.yml -n compas-build
           conda activate compas-build
+          IS_CONDA_PACKAGE=true
         elif [[ ${{ runner.os }} == "Linux" && -f env_linux.yml ]]; then
           conda env create -f env_linux.yml -n compas-build
           conda activate compas-build
-        else
+          IS_CONDA_PACKAGE=true
+        fi
+
+        if [[ "$IS_CONDA_PACKAGE" = true ]]; then
+
+          echo "This is a conda package."
+
+          if [[ ${{ inputs.test_lint }} = "true" ]]; then
+            invoke lint
+          fi;
+
+          if [[ ${{ inputs.test_compas }} = "true" ]]; then
+            python -m compas
+          fi;
+          
+          invoke test
+
+        fi;
+
+    - shell: bash
+      run: |
+
+        if [[ ! -f env_win.yml && ! -f env_osx.yml && ! -f env_linux.yml ]]; then
+
+          echo "This is a PYPI package."
+
           python -m pip install --upgrade pip
           pip install cython --install-option='--no-cython-compile'
           pip install --no-cache-dir -r requirements-dev.txt
-        fi
 
-        if [[ ${{ inputs.test_lint }} = "true" ]]; then
-          invoke lint
-        fi;
+          if [[ ${{ inputs.test_lint }} = "true" ]]; then
+            invoke lint
+          fi;
 
-        if [[ ${{ inputs.test_compas }} = "true" ]]; then
-          python -m compas
+          if [[ ${{ inputs.test_compas }} = "true" ]]; then
+            python -m compas
+          fi;
+          
+          invoke test
+
         fi;
-        
-        invoke test
