@@ -30,6 +30,10 @@ runs:
           conda env create -f env_linux.yml -n compas-build
           conda activate compas-build
           IS_CONDA_PACKAGE=true
+        elif [[ -f environment.yml ]]; then
+          conda env create -f environment.yml -n compas-build
+          conda activate compas-build
+          IS_CONDA_PACKAGE=true
         fi
 
         if [[ "$IS_CONDA_PACKAGE" = true ]]; then
