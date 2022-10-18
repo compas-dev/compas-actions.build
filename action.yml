@@ -55,7 +55,7 @@ runs:
     - shell: bash
       run: |
 
-        if [[ ! -f env_win.yml && ! -f env_osx.yml && ! -f env_linux.yml ]]; then
+        if [[ ! -f env_win.yml && ! -f env_osx.yml && ! -f env_linux.yml && ! -f environment.yml ]]; then
 
           echo "This is a PYPI package."
 
