@@ -56,7 +56,7 @@ runs:
 
     # Build as conda package.
     - if: inputs.use_conda == 'true'
-      uses: conda-incubator/setup-miniconda@v2.0.0
+      uses: conda-incubator/setup-miniconda@v2
       with:
         miniconda-version: latest
         channels: conda-forge
@@ -96,4 +96,3 @@ runs:
         if [[ ${{ inputs.test }} = "true" ]]; then
           invoke test
         fi;
-
