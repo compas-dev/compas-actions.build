@@ -52,7 +52,6 @@ runs:
 
     # Build as conda package.
     - if: inputs.use_conda == 'true'
-      shell: bash -l {0}
       uses: conda-incubator/setup-miniconda@v2.0.0
       with:
         miniconda-version: latest
