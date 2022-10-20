@@ -10,6 +10,10 @@ inputs:
     description: "whether to test with python -m compas"
     required: true
     default: "false"
+  test:
+    description: "whether to run invoke test"
+    required: false
+    default: "true"
   use_conda:
     description: "whether to build with conda"
     required: false
@@ -57,21 +61,29 @@ runs:
         miniconda-version: latest
         channels: conda-forge
         activate-environment: compas
+        python-version: ${{ inputs.python }}
 
     - if: inputs.use_conda == 'true'
       shell: bash -l {0}
       run: |
+        echo "This is a conda package."
+
         if [[ ${{ runner.os }} == "Windows" && -f env_win.yml ]]; then
+          echo using env_win.yml
           conda env update -f env_win.yml --prune -n compas
         elif [[ ${{ runner.os }} == "macOS" && -f env_osx.yml ]]; then
+          echo using env_osx.yml
           conda env update -f env_osx.yml --prune -n compas
         elif [[ ${{ runner.os }} == "Linux" && -f env_linux.yml ]]; then
+          echo using env_linux.yml
           conda env update -f env_linux.yml --prune -n compas
         elif [[ -f environment.yml ]]; then
+          echo using environment.yml
           conda env update -f environment.yml --prune -n compas
+        else
+          echo ERROR: Failed find environment yml file.
+          exit 1
         fi
-
-        echo "This is a conda package."
 
         if [[ ${{ inputs.test_lint }} = "true" ]]; then
           invoke lint
@@ -80,5 +92,8 @@ runs:
         if [[ ${{ inputs.test_compas }} = "true" ]]; then
           python -m compas
         fi;
-        
-        invoke test
+
+        if [[ ${{ inputs.test }} = "true" ]]; then
+          invoke test
+        fi;
+
