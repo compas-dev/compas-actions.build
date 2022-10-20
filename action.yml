@@ -25,71 +25,65 @@ runs:
 
     - uses: actions/checkout@v3
 
+    # Build as PYPI package.
     - if: inputs.use_conda == 'false'
-      name: Set up Python ${{ inputs.python }}
       uses: actions/setup-python@v4
       with:
+        python-version: ${{ inputs.python }}
+    
+    - if: inputs.use_conda == 'false'
+      shell: bash
+      run: |
+        echo "This is a PYPI package."
+
+        python -m pip install --upgrade pip
+        pip install cython --install-option='--no-cython-compile'
+        pip install --no-cache-dir -r requirements-dev.txt
+
+        if [[ ${{ inputs.test_lint }} = "true" ]]; then
+          invoke lint
+        fi;
+
+        if [[ ${{ inputs.test_compas }} = "true" ]]; then
+          python -m compas
+        fi;
+        
+        invoke test
+
+    # Build as conda package.
+    - if: inputs.use_conda == 'true'
+      shell: bash -l {0}
+      uses: conda-incubator/setup-miniconda@v2.0.0
+      with:
+        miniconda-version: latest
+        channels: conda-forge
         python-version: ${{ inputs.python }}
 
     - if: inputs.use_conda == 'true'
       shell: bash -l {0}
       run: |
-        IS_CONDA_PACKAGE=false
-
         if [[ ${{ runner.os }} == "Windows" && -f env_win.yml ]]; then
           conda env create -f env_win.yml -n compas-build
           conda activate compas-build
-          IS_CONDA_PACKAGE=true
         elif [[ ${{ runner.os }} == "macOS" && -f env_osx.yml ]]; then
           conda env create -f env_osx.yml -n compas-build
           conda activate compas-build
-          IS_CONDA_PACKAGE=true
         elif [[ ${{ runner.os }} == "Linux" && -f env_linux.yml ]]; then
           conda env create -f env_linux.yml -n compas-build
           conda activate compas-build
-          IS_CONDA_PACKAGE=true
         elif [[ -f environment.yml ]]; then
           conda env create -f environment.yml -n compas-build
           conda activate compas-build
-          IS_CONDA_PACKAGE=true
         fi
 
-        if [[ "$IS_CONDA_PACKAGE" = true ]]; then
+        echo "This is a conda package."
 
-          echo "This is a conda package."
-
-          if [[ ${{ inputs.test_lint }} = "true" ]]; then
-            invoke lint
-          fi;
-
-          if [[ ${{ inputs.test_compas }} = "true" ]]; then
-            python -m compas
-          fi;
-          
-          invoke test
-
+        if [[ ${{ inputs.test_lint }} = "true" ]]; then
+          invoke lint
         fi;
 
-    - if: inputs.use_conda == 'false'
-      shell: bash
-      run: |
-
-        if [[ ! -f env_win.yml && ! -f env_osx.yml && ! -f env_linux.yml && ! -f environment.yml ]]; then
-
-          echo "This is a PYPI package."
-
-          python -m pip install --upgrade pip
-          pip install cython --install-option='--no-cython-compile'
-          pip install --no-cache-dir -r requirements-dev.txt
-
-          if [[ ${{ inputs.test_lint }} = "true" ]]; then
-            invoke lint
-          fi;
-
-          if [[ ${{ inputs.test_compas }} = "true" ]]; then
-            python -m compas
-          fi;
-          
-          invoke test
-
+        if [[ ${{ inputs.test_compas }} = "true" ]]; then
+          python -m compas
         fi;
+        
+        invoke test
