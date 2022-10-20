@@ -10,6 +10,14 @@ inputs:
     description: "whether to test with python -m compas"
     required: true
     default: "false"
+  use_conda:
+    description: "whether to build with conda"
+    required: false
+    default: "false"
+  python:
+    description: "which python version to build with"
+    required: true
+    default: "3.10"
 
 runs:
   using: "composite"
@@ -17,12 +25,14 @@ runs:
 
     - uses: actions/checkout@v3
 
-    - name: Set up Python ${{ matrix.python-version }}
+    - if: inputs.use_conda == 'false'
+      name: Set up Python ${{ inputs.python }}
       uses: actions/setup-python@v4
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: ${{ inputs.python }}
 
-    - shell: bash -l {0}
+    - if: inputs.use_conda == 'true'
+      shell: bash -l {0}
       run: |
         IS_CONDA_PACKAGE=false
 
@@ -60,7 +70,8 @@ runs:
 
         fi;
 
-    - shell: bash
+    - if: inputs.use_conda == 'false'
+      shell: bash
       run: |
 
         if [[ ! -f env_win.yml && ! -f env_osx.yml && ! -f env_linux.yml && ! -f environment.yml ]]; then
