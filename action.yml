@@ -70,16 +70,16 @@ runs:
 
         if [[ ${{ runner.os }} == "Windows" && -f env_win.yml ]]; then
           echo using env_win.yml
-          conda env update -f env_win.yml --prune -n compas
+          conda env update -f env_win.yml -n compas
         elif [[ ${{ runner.os }} == "macOS" && -f env_osx.yml ]]; then
           echo using env_osx.yml
-          conda env update -f env_osx.yml --prune -n compas
+          conda env update -f env_osx.yml -n compas
         elif [[ ${{ runner.os }} == "Linux" && -f env_linux.yml ]]; then
           echo using env_linux.yml
-          conda env update -f env_linux.yml --prune -n compas
+          conda env update -f env_linux.yml -n compas
         elif [[ -f environment.yml ]]; then
           echo using environment.yml
-          conda env update -f environment.yml --prune -n compas
+          conda env update -f environment.yml -n compas
         else
           echo ERROR: Failed find environment yml file.
           exit 1
