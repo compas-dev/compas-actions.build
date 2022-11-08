@@ -22,6 +22,10 @@ inputs:
     description: "which python version to build with"
     required: true
     default: "3.10"
+  build_ghpython_components:
+    description: 'Whether to build gh_python components'
+    required: false
+    default: 'false'
 
 runs:
   using: "composite"
@@ -53,6 +57,22 @@ runs:
         fi;
         
         invoke test
+
+    - uses: NuGet/setup-nuget@v1.0.5
+      if: inputs.build_ghpython_components == 'true'
+
+    - shell: bash
+      if: inputs.build_ghpython_components == 'true'
+      run: |
+        choco install ironpython --version=2.7.8.1
+
+    - name: 🦗 Build grasshopper components
+      uses: compas-dev/compas-actions.ghpython_components@v2
+      if: inputs.build_ghpython_components == 'true'
+      with:
+        source: src/compas_ghpython/components
+        target: src/compas_ghpython/components/ghuser
+  
 
     # Build as conda package.
     - if: inputs.use_conda == 'true'
