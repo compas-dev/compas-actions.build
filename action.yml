@@ -1,36 +1,43 @@
 name: "compas-actions.build"
-description: "Build and test COMPAS or its plugins"
+description: "Build and test COMPAS or its plugins."
 
 inputs:
   test_lint:
-    description: "whether to test lint errors"
+    description: "Whether to test lint errors."
     required: true
     default: "false"
   test_compas:
-    description: "whether to test with python -m compas"
+    description: "Whether to test with python -m compas."
     required: true
     default: "false"
   test:
-    description: "whether to run invoke test"
+    description: "Whether to run invoke test."
     required: false
     default: "true"
   use_conda:
-    description: "whether to build with conda"
+    description: "Whether to build with conda."
     required: false
     default: "false"
   python:
-    description: "which python version to build with"
+    description: "which python version to build with."
     required: true
     default: "3.10"
   build_ghpython_components:
-    description: 'Whether to build gh_python components'
+    description: "Whether to build gh_python components."
     required: false
-    default: 'false'
+    default: "false"
+  gh_source:
+    description: "The source path to build ghpython_components"
+    required: false
+    default: "src/compas_ghpython/components"
+  gh_target:
+    description: "The target path to build ghpython_components"
+    required: false
+    default: "src/compas_ghpython/components/ghuser"
 
 runs:
   using: "composite"
   steps:
-
     - uses: actions/checkout@v3
 
     # Build as PYPI package.
@@ -38,7 +45,7 @@ runs:
       uses: actions/setup-python@v4
       with:
         python-version: ${{ inputs.python }}
-    
+
     - if: inputs.use_conda == 'false'
       shell: bash
       run: |
@@ -55,8 +62,10 @@ runs:
         if [[ ${{ inputs.test_compas }} = "true" ]]; then
           python -m compas
         fi;
-        
-        invoke test
+
+        if [[ ${{ inputs.test }} = "true" ]]; then
+          invoke test
+        fi;
 
     - uses: NuGet/setup-nuget@v1.0.5
       if: inputs.build_ghpython_components == 'true'
@@ -70,9 +79,8 @@ runs:
       uses: compas-dev/compas-actions.ghpython_components@v2
       if: inputs.build_ghpython_components == 'true'
       with:
-        source: src/compas_ghpython/components
-        target: src/compas_ghpython/components/ghuser
-  
+        source: ${{ inputs.gh_source }}
+        target: ${{ inputs.gh_target }}
 
     # Build as conda package.
     - if: inputs.use_conda == 'true'
