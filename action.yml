@@ -2,15 +2,15 @@ name: "compas-actions.build"
 description: "Build and test COMPAS or its plugins."
 
 inputs:
-  test_lint:
+  invoke_lint:
     description: "Whether to test lint errors."
     required: true
     default: "false"
-  test_compas:
+  check_import:
     description: "Whether to test with python -m compas."
     required: true
     default: "false"
-  test:
+  invoke_test:
     description: "Whether to run invoke test."
     required: false
     default: "true"
@@ -55,15 +55,15 @@ runs:
         pip install cython --install-option='--no-cython-compile'
         pip install --no-cache-dir -r requirements-dev.txt
 
-        if [[ ${{ inputs.test_lint }} = "true" ]]; then
+        if [[ ${{ inputs.invoke_lint }} = "true" ]]; then
           invoke lint
         fi;
 
-        if [[ ${{ inputs.test_compas }} = "true" ]]; then
+        if [[ ${{ inputs.check_import }} = "true" ]]; then
           python -m compas
         fi;
 
-        if [[ ${{ inputs.test }} = "true" ]]; then
+        if [[ ${{ inputs.invoke_test }} = "true" ]]; then
           invoke test
         fi;
 
@@ -113,14 +113,14 @@ runs:
           exit 1
         fi
 
-        if [[ ${{ inputs.test_lint }} = "true" ]]; then
+        if [[ ${{ inputs.invoke_lint }} = "true" ]]; then
           invoke lint
         fi;
 
-        if [[ ${{ inputs.test_compas }} = "true" ]]; then
+        if [[ ${{ inputs.check_import }} = "true" ]]; then
           python -m compas
         fi;
 
-        if [[ ${{ inputs.test }} = "true" ]]; then
+        if [[ ${{ inputs.invoke_test }} = "true" ]]; then
           invoke test
         fi;
