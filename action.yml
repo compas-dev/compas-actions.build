@@ -34,11 +34,17 @@ inputs:
     description: "The target path to build ghpython_components"
     required: false
     default: "src/compas_ghpython/components/ghuser"
+  submodules:
+    description: "Whether to checkout submodules, value can be 'true', 'recursive', or 'false'"
+    required: false
+    default: "true"
 
 runs:
   using: "composite"
   steps:
     - uses: actions/checkout@v3
+      with:
+        submodules: ${{ inputs.submodules }}
 
     # Build as PYPI package.
     - if: inputs.use_conda == 'false'
