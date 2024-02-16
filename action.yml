@@ -23,17 +23,24 @@ inputs:
     required: true
     default: "3.10"
   build_ghpython_components:
-    description: "Whether to build gh_python components."
+    description: "Whether to build Grasshopper components."
     required: false
     default: "false"
   gh_source:
-    description: "The source path to build ghpython_components"
+    description: "The source path to build Grasshopper components"
     required: false
     default: "src/compas_ghpython/components"
   gh_target:
-    description: "The target path to build ghpython_components"
+    description: "The target path to build Grasshopper components"
     required: false
     default: "src/compas_ghpython/components/ghuser"
+  gh_prefix:
+    description: "optional prefix added to the name of each generated Grasshopper component"
+    required: false
+  gh_interpreter:
+    description: "interpreter used to build Grasshopper components, either 'ironpython' or 'cpython'. Defaults to 'ironpython'"
+    required: false
+    default: "ironpython"
   submodules:
     description: "Whether to checkout submodules, value can be 'true', 'recursive', or 'false'"
     required: false
@@ -82,11 +89,13 @@ runs:
         choco install ironpython --version=2.7.8.1
 
     - name: 🦗 Build grasshopper components
-      uses: compas-dev/compas-actions.ghpython_components@v2
+      uses: compas-dev/compas-actions.ghpython_components@v5
       if: inputs.build_ghpython_components == 'true'
       with:
         source: ${{ inputs.gh_source }}
         target: ${{ inputs.gh_target }}
+        prefix: ${{ inputs.gh_prefix }}
+        interpreter: ${{ inputs.gh_interpreter }}
 
     # Build as conda package.
     - if: inputs.use_conda == 'true'
