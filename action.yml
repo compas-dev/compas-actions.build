@@ -65,7 +65,7 @@ runs:
         echo "This is a PYPI package."
 
         python -m pip install --upgrade pip
-        pip install --no-cache-dir -r requirements-dev.txt
+        pip install -e ".[dev]" 
 
         if [[ ${{ inputs.invoke_lint }} = "true" ]]; then
           invoke lint
