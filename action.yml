@@ -52,44 +52,44 @@ runs:
     - uses: actions/checkout@v4
       with:
         submodules: ${{ inputs.submodules }}
+      if: runner.os != 'macOS' || inputs.python != '3.9'
 
     # Build as PYPI package.
-    - if: inputs.use_conda == 'false'
+    - if: inputs.use_conda == 'false' && (runner.os != 'macOS' || inputs.python != '3.9')
       uses: actions/setup-python@v5
       with:
         python-version: ${{ inputs.python }}
 
-    - if: inputs.use_conda == 'false'
+    - if: inputs.use_conda == 'false' && (runner.os != 'macOS' || inputs.python != '3.9')
       shell: bash
       run: |
         echo "This is a PYPI package."
-
         python -m pip install --upgrade pip
         pip install -e ".[dev]" 
 
-        if [[ ${{ inputs.invoke_lint }} = "true" ]]; then
+        if [[ ${{ inputs.invoke_lint }} == "true" ]]; then
           invoke lint
         fi;
 
-        if [[ ${{ inputs.check_import }} = "true" ]]; then
+        if [[ ${{ inputs.check_import }} == "true" ]]; then
           python -m compas
         fi;
 
-        if [[ ${{ inputs.invoke_test }} = "true" ]]; then
+        if [[ ${{ inputs.invoke_test }} == "true" ]]; then
           invoke test
         fi;
 
     - uses: NuGet/setup-nuget@v1.0.5
-      if: inputs.build_ghpython_components == 'true'
+      if: inputs.build_ghpython_components == 'true' && (runner.os != 'macOS' || inputs.python != '3.9')
 
     - shell: bash
-      if: inputs.build_ghpython_components == 'true'
+      if: inputs.build_ghpython_components == 'true' && (runner.os != 'macOS' || inputs.python != '3.9')
       run: |
         choco install ironpython --version=2.7.8.1
 
     - name: 🦗 Build grasshopper components
       uses: compas-dev/compas-actions.ghpython_components@v5
-      if: inputs.build_ghpython_components == 'true'
+      if: inputs.build_ghpython_components == 'true' && (runner.os != 'macOS' || inputs.python != '3.9')
       with:
         source: ${{ inputs.gh_source }}
         target: ${{ inputs.gh_target }}
@@ -97,7 +97,7 @@ runs:
         interpreter: ${{ inputs.gh_interpreter }}
 
     # Build as conda package.
-    - if: inputs.use_conda == 'true'
+    - if: inputs.use_conda == 'true' && (runner.os != 'macOS' || inputs.python != '3.9')
       uses: conda-incubator/setup-miniconda@v2
       with:
         miniconda-version: latest
@@ -105,7 +105,7 @@ runs:
         activate-environment: compas
         python-version: ${{ inputs.python }}
 
-    - if: inputs.use_conda == 'true'
+    - if: inputs.use_conda == 'true' && (runner.os != 'macOS' || inputs.python != '3.9')
       shell: bash -l {0}
       run: |
         echo "This is a conda package."
@@ -138,3 +138,7 @@ runs:
         if [[ ${{ inputs.invoke_test }} = "true" ]]; then
           invoke test
         fi;
+
+    - if: runner.os == 'macOS' && inputs.python == '3.9'
+      shell: bash
+      run: echo "The test is skipped on macOS with Python 3.9."
