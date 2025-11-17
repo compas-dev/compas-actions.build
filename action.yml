@@ -67,6 +67,9 @@ runs:
         python -m pip install --upgrade pip
         pip install -e ".[dev]" 
 
+        echo Running pre-build task
+        invoke pre-build
+
         if [[ ${{ inputs.invoke_lint }} == "true" ]]; then
           invoke lint
         fi;
@@ -126,6 +129,9 @@ runs:
           echo ERROR: Failed find environment yml file.
           exit 1
         fi
+
+        echo Running pre-build tasks
+        invoke pre-build
 
         if [[ ${{ inputs.invoke_lint }} = "true" ]]; then
           invoke lint
