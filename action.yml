@@ -45,6 +45,10 @@ inputs:
     description: "Whether to checkout submodules, value can be 'true', 'recursive', or 'false'"
     required: false
     default: "true"
+  run_prebuild:
+    description: "Whether to run the pre-build task after installation and before running any tests. Value can be 'true', or 'false'"
+    required: false
+    default: "false"
 
 runs:
   using: "composite"
@@ -67,8 +71,10 @@ runs:
         python -m pip install --upgrade pip
         pip install -e ".[dev]" 
 
-        echo Running pre-build task
-        invoke pre-build
+        if [[ ${{ inputs.run_prebuild }} = "true" ]]; then
+          echo Running pre-build task
+          invoke pre-build
+        fi;
 
         if [[ ${{ inputs.invoke_lint }} == "true" ]]; then
           invoke lint
@@ -130,8 +136,10 @@ runs:
           exit 1
         fi
 
-        echo Running pre-build tasks
-        invoke pre-build
+        if [[ ${{ inputs.run_prebuild }} = "true" ]]; then
+          echo Running pre-build task
+          invoke pre-build
+        fi;
 
         if [[ ${{ inputs.invoke_lint }} = "true" ]]; then
           invoke lint
