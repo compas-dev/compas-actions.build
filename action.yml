@@ -45,6 +45,10 @@ inputs:
     description: "Whether to checkout submodules, value can be 'true', 'recursive', or 'false'"
     required: false
     default: "true"
+  run_prebuild:
+    description: "Whether to run the pre-build task after installation and before running any tests. Value can be 'true', or 'false'"
+    required: false
+    default: "false"
 
 runs:
   using: "composite"
@@ -66,6 +70,11 @@ runs:
         echo "This is a PYPI package."
         python -m pip install --upgrade pip
         pip install -e ".[dev]" 
+
+        if [[ ${{ inputs.run_prebuild }} = "true" ]]; then
+          echo Running pre-build task
+          invoke pre-build
+        fi;
 
         if [[ ${{ inputs.invoke_lint }} == "true" ]]; then
           invoke lint
@@ -126,6 +135,11 @@ runs:
           echo ERROR: Failed find environment yml file.
           exit 1
         fi
+
+        if [[ ${{ inputs.run_prebuild }} = "true" ]]; then
+          echo Running pre-build task
+          invoke pre-build
+        fi;
 
         if [[ ${{ inputs.invoke_lint }} = "true" ]]; then
           invoke lint
