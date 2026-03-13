@@ -49,6 +49,10 @@ inputs:
     description: "Whether to run the pre-build task after installation and before running any tests. Value can be 'true', or 'false'"
     required: false
     default: "false"
+  extras:
+    description: "comma-separated list of optional dependencies to install (e.g. dev,docs,mkdocs)"
+    required: false
+    default: "dev"
 
 runs:
   using: "composite"
@@ -69,7 +73,10 @@ runs:
       run: |
         echo "This is a PYPI package."
         python -m pip install --upgrade pip
-        pip install -e ".[dev]" 
+
+        if [[ -n "${{ inputs.extras }}" ]]; then
+            pip install -e ".[${{ inputs.extras }}]"
+        fi
 
         if [[ ${{ inputs.run_prebuild }} = "true" ]]; then
           echo Running pre-build task
